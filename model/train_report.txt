@@ -1,0 +1,19 @@
+IronTwin – Model Training Report
+==================================================
+Training patients : 1600
+Test patients     : 400
+Features          : baseline_hb, ferritin, age, hb_day7, hb_day14, rise_day14, adherence, inflammation
+Target            : nonresponse_w8  (Hb rise < 2.0 g/dL by week 8)
+
+Results on held-out test set:
+  Model                 AUC    Sen    Spe
+---------------------------------------------
+  Okam rule           1.000  1.000  1.000
+  LogReg              1.000  1.000  1.000
+  GradBoost           1.000  1.000  1.000
+
+Primary decision model : okam_rule
+Probability model      : logreg
+
+NOTE: Models are trained on SIMULATED patients only.
+Credibility comes from simulator validation against real Dryad trial data.

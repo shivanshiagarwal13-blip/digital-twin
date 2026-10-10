@@ -2,111 +2,131 @@ import React, { useState } from 'react';
 import { 
   Heart, Activity, CheckCircle2, Check, ChevronDown, 
   Calendar, Phone, AlertCircle, ArrowRight, ShieldCheck, 
-  Smile, UserCheck, Stethoscope
+  Smile, UserCheck, Stethoscope, Users
 } from 'lucide-react';
+import { PATIENTS } from '../data/patients';
 
-export function PatientWorkspace({ onExitPortal }) {
+export function PatientWorkspace({ 
+  onExitPortal, 
+  selectedPatientId, 
+  onSelectPatientId 
+}) {
   const [language, setLanguage] = useState('en');
   const [tabletTaken, setTabletTaken] = useState(false);
   const [careModalOpen, setCareModalOpen] = useState(false);
 
-  // Translations for English, Hindi, Tamil, Telugu
+  // Active patient object
+  const currentPatient = PATIENTS.find(p => p.id === selectedPatientId) || PATIENTS[0];
+  const isHighRisk = currentPatient.riskLevel === 'High';
+  const firstName = currentPatient.name.split(' ')[0];
+
+  // Translations for English, Hindi, Tamil, Telugu with dynamic response condition
   const t = {
     en: {
       navTitle: "My health",
       breadcrumb: "My health journey",
-      dayTag: "DAY 14 OF YOUR RECOVERY",
-      greeting: "Hello, Priya",
+      dayTag: `DAY ${currentPatient.enrolledDays || 14} OF YOUR RECOVERY`,
+      greeting: `Hello, ${firstName}`,
       subGreeting: "Here is your simple health update for today.",
       treatmentStatusTag: "YOUR TREATMENT STATUS",
-      treatmentStatus: "You're getting better",
-      treatmentDesc: "Your iron level is rising as expected. Keep taking your tablet every day.",
+      treatmentStatus: isHighRisk ? "Absorption is slower than expected" : "You're getting better",
+      treatmentDesc: isHighRisk 
+        ? "Your body is having trouble absorbing oral iron tablets. Your doctor has been alerted to review IV iron options."
+        : "Your iron level is rising as expected. Keep taking your tablet every day.",
       hbTag: "HEMOGLOBIN",
-      hbVal: "10",
+      hbVal: currentPatient.vitals.hemoglobin.value,
       hbUnit: "g/dL",
-      hbSub: "+1.4 since start",
+      hbSub: currentPatient.vitals.hemoglobin.delta || "+1.4 since start",
       hrTitle: "Heart rate",
-      hrVal: "78 bpm",
-      hrSub: "Back in a healthy range",
+      hrVal: `${currentPatient.vitals.heartRate.value} bpm`,
+      hrSub: isHighRisk ? "Persistent tachycardia (O2 deficit)" : "Back in a healthy range",
       stepsTitle: "Daily movement",
-      stepsVal: "6,420 steps",
-      stepsSub: "More active than last week",
+      stepsVal: `${currentPatient.vitals.activity.value} steps`,
+      stepsSub: isHighRisk ? "Fatigue index elevated" : "More active than last week",
       tabletsTitle: "Tablets taken",
-      tabletsVal: "12 of 13",
-      tabletsSub: "Excellent consistency",
+      tabletsVal: currentPatient.vitals.adherence.sub || "12 of 14",
+      tabletsSub: isHighRisk ? "Good pill consistency" : "Excellent consistency",
       todaysPlan: "TODAY'S PLAN",
       todaysDate: "Tuesday, 14 May",
       oneSmallThing: "One small thing to do",
       ironTabletTag: "YOUR IRON TABLET",
-      takeAfterLunch: "Take after lunch",
-      tabletDesc: "Have it with water or citrus fruit—not tea, coffee, or milk.",
+      takeAfterLunch: isHighRisk ? "Discuss with PHC Doctor" : "Take after lunch",
+      tabletDesc: isHighRisk 
+        ? "Continue tablets for now with water. Do not stop without doctor's order."
+        : "Have it with water or citrus fruit—not tea, coffee, or milk.",
       markTaken: "Mark taken",
       takenSuccess: "Taken today",
       nextCheckInTag: "NEXT CHECK-IN",
-      nextCheckInTitle: "Week 4 hemoglobin check",
-      nextCheckInDesc: "Your ASHA worker will help arrange this at the PHC.",
-      in14Days: "In 14 days",
+      nextCheckInTitle: isHighRisk ? "PHC Doctor Clinical Consultation" : "Week 4 hemoglobin check",
+      nextCheckInDesc: isHighRisk
+        ? "Your ASHA worker is scheduling a clinic visit for possible IV iron FCM."
+        : "Your ASHA worker will help arrange this at the PHC.",
+      in14Days: isHighRisk ? "Prompt Follow-up" : "In 14 days",
       unwellPrompt: "Feeling unwell? Get help for fainting, chest pain, trouble breathing, or bleeding.",
       contactCareTeam: "Contact care team"
     },
     hi: {
       navTitle: "मेरी सेहत",
       breadcrumb: "मेरी स्वास्थ्य यात्रा",
-      dayTag: "आपके सुधार का 14वां दिन",
-      greeting: "नमस्ते, प्रिया",
+      dayTag: `आपके सुधार का ${currentPatient.enrolledDays || 14}वां दिन`,
+      greeting: `नमस्ते, ${firstName}`,
       subGreeting: "आज के लिए आपका आसान स्वास्थ्य विवरण।",
       treatmentStatusTag: "आपकी सेहत की स्थिति",
-      treatmentStatus: "आपकी सेहत सुधर रही है",
-      treatmentDesc: "आपका आयरन स्तर अपेक्षा के अनुसार बढ़ रहा है। अपनी गोली रोज़ाना लेते रहें।",
+      treatmentStatus: isHighRisk ? "सुधार अपेक्षा से धीमा है" : "आपकी सेहत सुधर रही है",
+      treatmentDesc: isHighRisk 
+        ? "आपके शरीर में आयरन की गोलियां ठीक से अवशोषित नहीं हो पा रही हैं। डॉक्टर को सूचित कर दिया गया है।"
+        : "आपका आयरन स्तर अपेक्षा के अनुसार बढ़ रहा है। अपनी गोली रोज़ाना लेते रहें।",
       hbTag: "हीमोग्लोबिन",
-      hbVal: "10",
+      hbVal: currentPatient.vitals.hemoglobin.value,
       hbUnit: "g/dL",
-      hbSub: "शुरुआत से +1.4 अधिक",
+      hbSub: currentPatient.vitals.hemoglobin.delta || "शुरुआत से वृद्धि",
       hrTitle: "हृदय गति",
-      hrVal: "78 bpm",
-      hrSub: "सामान्य और स्वस्थ दायरे में",
+      hrVal: `${currentPatient.vitals.heartRate.value} bpm`,
+      hrSub: isHighRisk ? "हृदय गति अभी भी अधिक है" : "सामान्य और स्वस्थ दायरे में",
       stepsTitle: "दैनिक चलना-फिरना",
-      stepsVal: "6,420 कदम",
-      stepsSub: "पिछले हफ्ते से अधिक सक्रिय",
+      stepsVal: `${currentPatient.vitals.activity.value} कदम`,
+      stepsSub: isHighRisk ? "कमज़ोरी व थकान के लक्षण" : "पिछले हफ्ते से अधिक सक्रिय",
       tabletsTitle: "ली गई गोलियां",
-      tabletsVal: "13 में से 12",
-      tabletsSub: "बहुत अच्छा नियम",
+      tabletsVal: currentPatient.vitals.adherence.sub || "14 में से 12",
+      tabletsSub: "नियमितता अच्छी है",
       todaysPlan: "आज की योजना",
       todaysDate: "मंगलवार, 14 मई",
       oneSmallThing: "आज का एक ज़रूरी काम",
       ironTabletTag: "आपकी आयरन की गोली",
-      takeAfterLunch: "दोपहर के खाने के बाद लें",
-      tabletDesc: "इसे पानी या नींबू/संतरे के रस के साथ लें—चाय, कॉफी या दूध के साथ नहीं।",
+      takeAfterLunch: isHighRisk ? "डॉक्टर से सलाह लें" : "दोपहर के खाने के बाद लें",
+      tabletDesc: "इसे पानी या नींबू के रस के साथ लें—चाय, कॉफी या दूध के साथ नहीं।",
       markTaken: "ली गई दर्ज करें",
       takenSuccess: "आज ले ली गई",
       nextCheckInTag: "अगली जांच",
-      nextCheckInTitle: "सप्ताह 4 हीमोग्लोबिन जांच",
-      nextCheckInDesc: "आपकी आशा दीदी पीएचसी (PHC) में इसकी व्यवस्था करेंगी।",
-      in14Days: "14 दिनों में",
-      unwellPrompt: "अस्वस्थ महसूस कर रही हैं? चक्कर, सीने में दर्द, सांस लेने में तकलीफ या रक्तस्राव पर तुरंत मदद लें।",
+      nextCheckInTitle: isHighRisk ? "पीएचसी (PHC) डॉक्टर परामर्श" : "सप्ताह 4 हीमोग्लोबिन जांच",
+      nextCheckInDesc: "आपकी आशा दीदी पीएचसी में डॉक्टर से जांच की व्यवस्था करेंगी।",
+      in14Days: isHighRisk ? "तत्काल" : "14 दिनों में",
+      unwellPrompt: "अस्वस्थ महसूस कर रही हैं? चक्कर, सीने में दर्द, सांस लेने में तकलीफ पर तुरंत मदद लें।",
       contactCareTeam: "स्वास्थ्य टीम से संपर्क करें"
     },
     ta: {
       navTitle: "என் உடல்நலம்",
       breadcrumb: "என் நலப்பயணம்",
-      dayTag: "உங்கள் குணமடைதலின் 14வது நாள்",
-      greeting: "வணக்கம், பிரியா",
+      dayTag: `உங்கள் குணமடைதலின் ${currentPatient.enrolledDays || 14}வது நாள்`,
+      greeting: `வணக்கம், ${firstName}`,
       subGreeting: "இன்றைய உங்கள் எளிய உடல்நல விவரம்.",
       treatmentStatusTag: "சிகிச்சை நிலை",
-      treatmentStatus: "நீங்கள் நலமடைந்து வருகிறீர்கள்",
-      treatmentDesc: "உங்கள் இரும்புச்சத்து எதிர்பார்த்தபடி உயர்கிறது. தினமும் மாத்திரையைத் தவறாமல் உட்கொள்ளுங்கள்.",
+      treatmentStatus: isHighRisk ? "குணமடைதல் சற்று மெதுவாக உள்ளது" : "நீங்கள் நலமடைந்து வருகிறீர்கள்",
+      treatmentDesc: isHighRisk 
+        ? "இரும்புச்சத்து மாத்திரைகள் சரியாக உறிஞ்சப்படவில்லை. மருத்துவர் மாற்று ஊசி மருந்தை பரிசீலிக்கிறார்."
+        : "உங்கள் இரும்புச்சத்து எதிர்பார்த்தபடி உயர்கிறது. தினமும் மாத்திரையைத் தவறாமல் உட்கொள்ளுங்கள்.",
       hbTag: "ஹீமோகுளோபின்",
-      hbVal: "10",
+      hbVal: currentPatient.vitals.hemoglobin.value,
       hbUnit: "g/dL",
-      hbSub: "துவக்கத்தை விட +1.4 உயர்வு",
+      hbSub: currentPatient.vitals.hemoglobin.delta || "+1.4 உயர்வு",
       hrTitle: "இதயத் துடிப்பு",
-      hrVal: "78 bpm",
-      hrSub: "ஆரோக்கியமான நிலைக்குத் திரும்பியது",
+      hrVal: `${currentPatient.vitals.heartRate.value} bpm`,
+      hrSub: isHighRisk ? "இதயத் துடிப்பு அதிகமாக உள்ளது" : "ஆரோக்கியமான நிலைக்குத் திரும்பியது",
       stepsTitle: "தினசரி நடை",
-      stepsVal: "6,420 அடிகள்",
-      stepsSub: "சென்ற வாரத்தை விட சுறுசுறுப்பு",
+      stepsVal: `${currentPatient.vitals.activity.value} அடிகள்`,
+      stepsSub: isHighRisk ? "சோர்வு அதிகமாக உள்ளது" : "சென்ற வாரத்தை விட சுறுசுறுப்பு",
       tabletsTitle: "எடுத்துக்கொண்ட மாத்திரைகள்",
-      tabletsVal: "13 இல் 12",
+      tabletsVal: currentPatient.vitals.adherence.sub || "14 இல் 12",
       tabletsSub: "சிறந்த ஒழுங்கு",
       todaysPlan: "இன்றைய திட்டம்",
       todaysDate: "செவ்வாய், 14 மே",
@@ -117,35 +137,37 @@ export function PatientWorkspace({ onExitPortal }) {
       markTaken: "எடுத்துக்கொண்டேன்",
       takenSuccess: "இன்று உட்கொண்டாச்சு",
       nextCheckInTag: "அடுத்த பரிசோதனை",
-      nextCheckInTitle: "4வது வார ஹீமோகுளோபின் பரிசோதனை",
+      nextCheckInTitle: isHighRisk ? "PHC மருத்துவ பரிசோதனை" : "4வது வார ஹீமோகுளோபின் பரிசோதனை",
       nextCheckInDesc: "உங்கள் ஆஷா பணியாளர் ஆரம்ப சுகாதார நிலையத்தில் ஏற்பாடு செய்வார்.",
-      in14Days: "14 நாட்களில்",
+      in14Days: isHighRisk ? "விரைவில்" : "14 நாட்களில்",
       unwellPrompt: "உடல் சோர்வா? மயக்கம், நெஞ்சு வலி, மூச்சுத்திணறல் அல்லது இரத்தப்போக்கு இருந்தால் தொடர்பு கொள்ளவும்.",
       contactCareTeam: "மருத்துவக் குழுவைத் தொடர்பு கொள்ள"
     },
     te: {
       navTitle: "నా ఆరోగ్యం",
       breadcrumb: "నా ఆరోగ్య ప్రయాణం",
-      dayTag: "మీ రికవరీలో 14వ రోజు",
-      greeting: "నమస్తే, ప్రియా",
+      dayTag: `మీ రికవరీలో ${currentPatient.enrolledDays || 14}వ రోజు`,
+      greeting: `నమస్తే, ${firstName}`,
       subGreeting: "ఈరోజు మీ సులభమైన ఆరోగ్య సమాచారం.",
       treatmentStatusTag: "చికిత్స స్థితి",
-      treatmentStatus: "మీ ఆరోగ్యం మెరుగవుతోంది",
-      treatmentDesc: "మీ ఐరన్ స్థాయి ఊహించిన విధంగా పెరుగుతోంది. రోజూ మాత్రను తప్పకుండా వేసుకోండి.",
+      treatmentStatus: isHighRisk ? "స్పందన నెమ్మదిగా ఉంది" : "మీ ఆరోగ్యం మెరుగవుతోంది",
+      treatmentDesc: isHighRisk 
+        ? "మీ శరీరంలో ఐరన్ మాత్రలు సరిగ్గా శోషించబడటం లేదు. తదుపరి చికిత్స కోసం వైద్యుడిని సంప్రదించండి."
+        : "మీ ఐరన్ స్థాయి ఊహించిన విధంగా పెరుగుతోంది. రోజూ మాత్రను తప్పకుండా వేసుకోండి.",
       hbTag: "హిమోగ్లోబిన్",
-      hbVal: "10",
+      hbVal: currentPatient.vitals.hemoglobin.value,
       hbUnit: "g/dL",
-      hbSub: "ప్రారంభం నుండి +1.4",
+      hbSub: currentPatient.vitals.hemoglobin.delta || "+1.4",
       hrTitle: "గుండె వేగం",
-      hrVal: "78 bpm",
-      hrSub: "ఆరోగ్యకరమైన స్థాయికి చేరింది",
-      stepsTitle: "రోజువారీ నడక",
-      stepsVal: "6,420 అడుగులు",
-      stepsSub: "గత వారం కంటే ఎక్కువ చురుకుగా",
+      hrVal: `${currentPatient.vitals.heartRate.value} bpm`,
+      hrSub: isHighRisk ? "గుండె వేగం అధికంగా ఉంది" : "ఆరోగ్యకరమైన స్థాయిలో ఉంది",
+      stepsTitle: "దైనందిన నడక",
+      stepsVal: `${currentPatient.vitals.activity.value} అడుగులు`,
+      stepsSub: isHighRisk ? "నీరసం ఎక్కువగా ఉంది" : "గత వారం కంటే మెరుగైంది",
       tabletsTitle: "వేసుకున్న మాత్రలు",
-      tabletsVal: "13 లో 12",
-      tabletsSub: "చాలా మంచి క్రమశిక్షణ",
-      todaysPlan: "నేటి ప్రణాళిక",
+      tabletsVal: currentPatient.vitals.adherence.sub || "14 లో 12",
+      tabletsSub: "మంచి అలవాటు",
+      todaysPlan: "ఈరోజు ప్రణాళిక",
       todaysDate: "మంగళవారం, 14 మే",
       oneSmallThing: "చేయవలసిన ఒక ముఖ్యమైన పని",
       ironTabletTag: "మీ ఐరన్ మాత్ర",
@@ -154,9 +176,9 @@ export function PatientWorkspace({ onExitPortal }) {
       markTaken: "వేసుకున్నాను",
       takenSuccess: "ఈరోజు వేసుకున్నాను",
       nextCheckInTag: "తదుపరి పరీక్ష",
-      nextCheckInTitle: "4వ వారం హిమోగ్లోబిన్ పరీక్ష",
+      nextCheckInTitle: isHighRisk ? "పీహెచ్‌సీ (PHC) డాక్టర్ సంప్రదింపు" : "4వ వారం హిమోగ్లోబిన్ పరీక్ష",
       nextCheckInDesc: "మీ ఆశా కార్యకర్త పీహెచ్‌సీ (PHC) లో ఏర్పాటు చేస్తారు.",
-      in14Days: "14 రోజుల్లో",
+      in14Days: isHighRisk ? "త్వరలో" : "14 రోజుల్లో",
       unwellPrompt: "అనారోగ్యంగా ఉందా? కళ్ళు తిరగడం, ఛాతీ నొప్పి, శ్వాస తీసుకోవడంలో ఇబ్బంది లేదా రక్తస్రావం ఉంటే వెంటనే సంప్రదించండి.",
       contactCareTeam: "ఆరోగ్య బృందాన్ని సంప్రదించండి"
     }
@@ -192,8 +214,24 @@ export function PatientWorkspace({ onExitPortal }) {
           </div>
         </div>
 
-        {/* Right Exit & Avatar */}
-        <div className="flex items-center gap-4">
+        {/* Right Exit & Patient Switcher */}
+        <div className="flex items-center gap-3">
+          {/* Patient Selector */}
+          <div className="relative">
+            <select
+              value={currentPatient.id}
+              onChange={(e) => onSelectPatientId && onSelectPatientId(e.target.value)}
+              className="appearance-none bg-[#382620] hover:bg-[#473229] border border-[#523c31] text-[11px] font-semibold text-[#f5eee5] py-1.5 pl-3 pr-7 rounded-full cursor-pointer focus:outline-none"
+            >
+              {PATIENTS.map(p => (
+                <option key={p.id} value={p.id}>
+                  {p.name} ({p.riskLevel})
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="w-3 h-3 text-[#baa797] absolute right-2.5 top-2.5 pointer-events-none" />
+          </div>
+
           <button 
             onClick={onExitPortal}
             className="text-xs text-[#a99789] hover:text-[#faf6f0] flex items-center gap-1.5 transition-colors cursor-pointer"
@@ -201,7 +239,7 @@ export function PatientWorkspace({ onExitPortal }) {
             <span>Exit portal</span>
           </button>
           <div className="w-8 h-8 rounded-full bg-[#d8c7b5] text-[#2a1b16] font-bold text-xs flex items-center justify-center border border-[#baa794]">
-            PS
+            {currentPatient.avatar}
           </div>
         </div>
       </nav>
@@ -209,7 +247,7 @@ export function PatientWorkspace({ onExitPortal }) {
       {/* 2. Sub-header Breadcrumb */}
       <div className="bg-[#ede4d7] px-6 py-2.5 flex items-center justify-between text-xs text-[#6e5d52] border-b border-[#e0d3c2]">
         <div className="font-medium">
-          {currentT.breadcrumb}
+          {currentT.breadcrumb} · Viewing {currentPatient.name} ({currentPatient.id})
         </div>
         <div className="text-[11px] text-[#7a695d]">
           Last sync: today, 09:42
@@ -249,10 +287,16 @@ export function PatientWorkspace({ onExitPortal }) {
         </div>
 
         {/* Hero Treatment Status Card */}
-        <div className="bg-[#dfd0be] rounded-3xl p-6 border border-[#cebda9] flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
+        <div className={`rounded-3xl p-6 border flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm ${
+          isHighRisk 
+            ? 'bg-[#edd9d4] border-[#d8beba]'
+            : 'bg-[#dfd0be] border-[#cebda9]'
+        }`}>
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-full bg-[#3d271e] text-[#f7eee5] flex items-center justify-center shrink-0 shadow-sm mt-0.5">
-              <Check className="w-6 h-6 stroke-[2.5]" />
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 shadow-sm mt-0.5 ${
+              isHighRisk ? 'bg-[#7a3424] text-white' : 'bg-[#3d271e] text-[#f7eee5]'
+            }`}>
+              {isHighRisk ? <AlertCircle className="w-6 h-6 stroke-[2.5]" /> : <Check className="w-6 h-6 stroke-[2.5]" />}
             </div>
             <div>
               <div className="text-[10px] font-bold tracking-widest text-[#695244] uppercase">
@@ -309,43 +353,37 @@ export function PatientWorkspace({ onExitPortal }) {
           {/* Tablets taken */}
           <div className="bg-[#faf6f0] p-5 rounded-3xl border border-[#ded1c2] shadow-xs flex flex-col justify-between">
             <div className="flex items-center gap-2 text-xs text-[#735e51]">
-              <CheckCircle2 className="w-4 h-4 text-[#5a3e30]" />
+              <CheckCircle2 className="w-4 h-4 text-[#5c3e30]" />
               <span className="font-medium">{currentT.tabletsTitle}</span>
             </div>
             <div className="my-3">
-              <div className="text-2xl font-serif font-bold text-[#201511]">
-                {tabletTaken ? "13 of 13" : currentT.tabletsVal}
-              </div>
+              <div className="text-2xl font-serif font-bold text-[#201511]">{currentT.tabletsVal}</div>
               <div className="text-[11px] text-[#6d574b] mt-0.5">{currentT.tabletsSub}</div>
             </div>
           </div>
         </div>
 
-        {/* TODAY'S PLAN Section */}
-        <div className="space-y-4 pt-2">
-          <div className="flex items-center justify-between text-xs">
-            <span className="text-[10px] font-bold tracking-wider text-[#796456] uppercase">
-              {currentT.todaysPlan}
-            </span>
-            <span className="text-[#786457] font-medium">{currentT.todaysDate}</span>
+        {/* Today's Action Plan */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-[#796456]">
+            <span>{currentT.todaysPlan}</span>
+            <span>{currentT.todaysDate}</span>
           </div>
 
-          <h3 className="text-xl font-bold tracking-tight text-[#201511]">
-            {currentT.oneSmallThing}
-          </h3>
-
-          {/* Action Card 1: Iron Tablet */}
-          <div className="bg-[#eedecf] rounded-3xl p-5 border border-[#ddccbd] flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
+          {/* Action Card 1: Tablet routine */}
+          <div className="bg-[#faf6f0] rounded-3xl p-5 border border-[#ded1c2] flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
             <div className="flex items-start gap-3.5">
-              <div className="w-2.5 h-2.5 rounded-full bg-[#201511] mt-1.5 shrink-0" />
+              <div className="w-9 h-9 rounded-xl bg-[#ede0d2] text-[#4d3629] flex items-center justify-center shrink-0 mt-0.5">
+                <Smile className="w-4 h-4" />
+              </div>
               <div>
-                <div className="text-[10px] font-bold tracking-wider text-[#705648] uppercase">
+                <div className="text-[10px] font-bold tracking-wider text-[#796456] uppercase">
                   {currentT.ironTabletTag}
                 </div>
                 <h4 className="font-bold text-base text-[#211512] mt-0.5">
                   {currentT.takeAfterLunch}
                 </h4>
-                <p className="text-xs text-[#5c4639] mt-1">
+                <p className="text-xs text-[#6e584b] mt-1 leading-relaxed max-w-md">
                   {currentT.tabletDesc}
                 </p>
               </div>
@@ -372,7 +410,7 @@ export function PatientWorkspace({ onExitPortal }) {
             </div>
           </div>
 
-          {/* Action Card 2: Next check-in (Page 7) */}
+          {/* Action Card 2: Next check-in */}
           <div className="bg-[#faf6f0] rounded-3xl p-5 border border-[#ded1c2] flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
             <div className="flex items-start gap-3.5">
               <div className="w-9 h-9 rounded-xl bg-[#ede0d2] text-[#4d3629] flex items-center justify-center shrink-0 mt-0.5">
@@ -399,7 +437,7 @@ export function PatientWorkspace({ onExitPortal }) {
           </div>
         </div>
 
-        {/* Emergency & Care Team Banner (Page 7 bottom) */}
+        {/* Emergency & Care Team Banner */}
         <div className="bg-[#ede4d7] rounded-2xl p-4 border border-[#ddd0c0] flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs text-[#5a4538]">
           <div className="flex items-center gap-2.5">
             <Heart className="w-4 h-4 text-[#8a4a39] shrink-0" />

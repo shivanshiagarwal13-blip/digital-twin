@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   Camera, Plus, Search, ChevronRight, Activity, Heart, 
   CheckCircle2, Sparkles, Check, FileText, ArrowRight, 
-  Globe, Stethoscope, Droplets
+  Globe, Stethoscope, Droplets, UserPlus
 } from 'lucide-react';
 import { PATIENTS } from '../data/patients';
 import { NFHS5_STATES } from '../data/states';
@@ -18,7 +18,8 @@ export function DoctorWorkspace({
   onOpenRationale,
   onOpenReferral,
   onOpenFullCohort,
-  onOpenProgramBrief
+  onOpenProgramBrief,
+  onOpenEnroll
 }) {
   const [patientSearch, setPatientSearch] = useState('');
   const [stateSearch, setStateSearch] = useState('');
@@ -133,7 +134,16 @@ export function DoctorWorkspace({
                   14 enrolled
                 </span>
               </div>
-              <h3 className="font-bold text-lg text-white tracking-tight">Active patients</h3>
+              <div className="flex items-center justify-between">
+                <h3 className="font-bold text-lg text-white tracking-tight">Active patients</h3>
+                <button
+                  onClick={onOpenEnroll}
+                  className="px-2.5 py-1 rounded-full bg-[#36241b] hover:bg-[#4a3226] text-[11px] font-semibold text-[#f5eee5] flex items-center gap-1 border border-[#4d3528] cursor-pointer transition-colors"
+                >
+                  <UserPlus className="w-3 h-3 text-[#d2ab96]" />
+                  <span>Enroll</span>
+                </button>
+              </div>
 
               {/* Dark Search Input */}
               <div className="mt-3 relative">
@@ -484,6 +494,23 @@ export function DoctorWorkspace({
                         </>
                       )}
 
+                      {/* What-If IV Iron Alternate Trajectory Overlay (Green/Golden line) */}
+                      {whatIfMode === 'iv' && (
+                        <>
+                          <path
+                            d="M 200 160 Q 320 120 510 95"
+                            fill="none"
+                            stroke="#10b981"
+                            strokeWidth="3"
+                            strokeDasharray="4 3"
+                          />
+                          <circle cx="290" cy="138" r="3.5" fill="#10b981" />
+                          <circle cx="400" cy="115" r="3.5" fill="#10b981" />
+                          <circle cx="510" cy="95" r="4" fill="#10b981" />
+                          <text x="375" y="105" fill="#10b981" fontSize="9" fontWeight="bold">+0.84 g/dL IV Iron</text>
+                        </>
+                      )}
+
                       {/* Observed Curve (Solid line with markers) */}
                       {currentPatient.riskLevel === 'Low risk' ? (
                         <>
@@ -524,10 +551,12 @@ export function DoctorWorkspace({
                   {/* Chart Footnote Stats */}
                   <div className="flex items-center justify-between pt-3 border-t border-[#f0e6dc] text-xs">
                     <span className="font-semibold text-[#3e2c22]">
-                      +1.4 g/dL since baseline
+                      {currentPatient.vitals?.hemoglobin?.delta || '+1.4 g/dL since baseline'}
                     </span>
                     <span className="font-semibold text-[#3e2c22]">
-                      {currentPatient.riskLevel === 'Low risk' ? 'Expected Week 12: 12.7 g/dL' : 'Projected Week 12: 9.5 g/dL (Stalled)'}
+                      {currentPatient.riskLevel === 'Low risk'
+                        ? `Expected Week 12: ${currentPatient.trajectory?.[6]?.forecast || 12.7} g/dL`
+                        : `Projected Week 12: ${currentPatient.trajectory?.[6]?.forecast || 9.5} g/dL (Stalled)`}
                     </span>
                   </div>
                 </div>
@@ -609,48 +638,22 @@ export function DoctorWorkspace({
 
                   {/* Horizontal Factor Bars */}
                   <div className="space-y-3.5 pt-1">
-                    {/* Robust Day-14 Hb rise */}
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-xs">
-                        <span className="text-[#2c1d16] font-medium">Robust Day-14 Hb rise</span>
+                    {(currentPatient.xaiFactors || []).map((factor, idx) => (
+                      <div key={idx} className="space-y-1">
+                        <div className="flex justify-between text-xs">
+                          <span className="text-[#2c1d16] font-medium">{factor.name}</span>
+                          <span className={`font-mono font-bold ${factor.impact === 'negative' ? 'text-[#873827]' : 'text-[#382116]'}`}>
+                            {factor.value}
+                          </span>
+                        </div>
+                        <div className="h-1.5 w-full bg-[#ede1d4] rounded-full overflow-hidden">
+                          <div 
+                            className={`h-full rounded-full transition-all duration-700 ${factor.impact === 'negative' ? 'bg-[#984535]' : 'bg-[#382116]'}`}
+                            style={{ width: factor.width || '50%' }} 
+                          />
+                        </div>
                       </div>
-                      <div className="h-3 w-full bg-[#ede1d4] rounded-full overflow-hidden">
-                        <div className="h-full bg-[#382116] rounded-full transition-all duration-700" style={{ width: '92%' }} />
-                      </div>
-                    </div>
-
-                    {/* Low inflammatory marker */}
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-xs">
-                        <span className="text-[#2c1d16] font-medium">Low inflammatory marker</span>
-                        <span className="font-mono font-bold text-[#382116]">-10%</span>
-                      </div>
-                      <div className="h-1.5 w-full bg-[#ede1d4] rounded-full overflow-hidden">
-                        <div className="h-full bg-[#382116] rounded-full transition-all duration-700" style={{ width: '38%' }} />
-                      </div>
-                    </div>
-
-                    {/* Tablet adherence */}
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-xs">
-                        <span className="text-[#2c1d16] font-medium">Tablet adherence (92%)</span>
-                        <span className="font-mono font-bold text-[#382116]">-10%</span>
-                      </div>
-                      <div className="h-1.5 w-full bg-[#ede1d4] rounded-full overflow-hidden">
-                        <div className="h-full bg-[#382116] rounded-full transition-all duration-700" style={{ width: '38%' }} />
-                      </div>
-                    </div>
-
-                    {/* Baseline anemia severity */}
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-xs">
-                        <span className="text-[#2c1d16] font-medium">Baseline anemia severity</span>
-                        <span className="font-mono font-bold text-[#382116]">-5%</span>
-                      </div>
-                      <div className="h-1.5 w-full bg-[#ede1d4] rounded-full overflow-hidden">
-                        <div className="h-full bg-[#382116] rounded-full transition-all duration-700" style={{ width: '22%' }} />
-                      </div>
-                    </div>
+                    ))}
                   </div>
 
                   <div className="pt-2">
@@ -681,7 +684,7 @@ export function DoctorWorkspace({
                     <Sparkles className="w-4 h-4 text-[#8a5b42]" />
                   </div>
 
-                  {/* Pills */}
+                  {/* Pills: 4 Clinical Scenarios */}
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       onClick={() => setWhatIfMode('current')}
@@ -692,7 +695,7 @@ export function DoctorWorkspace({
                       }`}
                     >
                       <div className="font-bold">Current therapy</div>
-                      <div className="text-[10px] opacity-80 mt-0.5">Oral iron · 92% adherence</div>
+                      <div className="text-[10px] opacity-80 mt-0.5">Oral iron · Baseline</div>
                     </button>
 
                     <button
@@ -704,15 +707,47 @@ export function DoctorWorkspace({
                       }`}
                     >
                       <div className="font-bold">Switch to IV iron</div>
-                      <div className="text-[10px] opacity-80 mt-0.5">FCM projected +0.84 g/dL</div>
+                      <div className="text-[10px] opacity-80 mt-0.5">FCM boost +0.84 g/dL</div>
+                    </button>
+
+                    <button
+                      onClick={() => setWhatIfMode('adherence')}
+                      className={`p-2.5 rounded-2xl text-left border text-xs transition-all cursor-pointer ${
+                        whatIfMode === 'adherence'
+                          ? 'bg-[#decbb8] border-[#cbb39d] text-[#1f140e] font-semibold shadow-2xs'
+                          : 'bg-[#f4ebe0] border-[#e2d5c5] text-[#6b584c] hover:bg-[#ede0d2]'
+                      }`}
+                    >
+                      <div className="font-bold">Adherence &gt;95%</div>
+                      <div className="text-[10px] opacity-80 mt-0.5">Correct administration</div>
+                    </button>
+
+                    <button
+                      onClick={() => setWhatIfMode('tests')}
+                      className={`p-2.5 rounded-2xl text-left border text-xs transition-all cursor-pointer ${
+                        whatIfMode === 'tests'
+                          ? 'bg-[#decbb8] border-[#cbb39d] text-[#1f140e] font-semibold shadow-2xs'
+                          : 'bg-[#f4ebe0] border-[#e2d5c5] text-[#6b584c] hover:bg-[#ede0d2]'
+                      }`}
+                    >
+                      <div className="font-bold">Extra Workup</div>
+                      <div className="text-[10px] opacity-80 mt-0.5">B12 / Celiac / GI Screen</div>
                     </button>
                   </div>
 
                   {/* Projected stat */}
                   <div className="bg-[#f2e6d9] p-3.5 rounded-2xl border border-[#ddcfbf] flex items-center justify-between text-xs">
-                    <span className="text-[#5f4c41]">Projected Week 8 Hb</span>
+                    <span className="text-[#5f4c41]">
+                      {whatIfMode === 'tests' ? 'Recommended Investigation' : 'Projected Week 8 Hb'}
+                    </span>
                     <span className="text-base font-bold text-[#1f140e]">
-                      {whatIfMode === 'current' ? '11.8 g/dL' : '12.9 g/dL'}
+                      {whatIfMode === 'current'
+                        ? (currentPatient.whatIf?.currentTherapyWeek8 || '11.8 g/dL')
+                        : whatIfMode === 'iv'
+                        ? (currentPatient.whatIf?.ivIronWeek8 || '12.9 g/dL')
+                        : whatIfMode === 'adherence'
+                        ? `${(parseFloat(currentPatient.vitals.hemoglobin.value) + 1.8).toFixed(1)} g/dL`
+                        : 'Serum B12 + Celiac Panel'}
                     </span>
                   </div>
                 </div>

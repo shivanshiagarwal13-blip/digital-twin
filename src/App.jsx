@@ -8,11 +8,13 @@ import { BiochemicalRationaleModal } from './components/BiochemicalRationaleModa
 import { GanzoniReferralModal } from './components/GanzoniReferralModal';
 import { FullCohortModal } from './components/FullCohortModal';
 import { ProgramBriefModal } from './components/ProgramBriefModal';
+import { EnrollPatientModal } from './components/EnrollPatientModal';
 import { PATIENTS } from './data/patients';
 
 export default function App() {
   const [view, setView] = useState('landing'); // 'landing', 'doctor', 'patient'
   const [doctorTab, setDoctorTab] = useState('patient_care'); // 'patient_care', 'program_view'
+  const [patientList, setPatientList] = useState(PATIENTS);
   const [selectedPatientId, setSelectedPatientId] = useState('AMB-2048');
 
   // Modals state
@@ -20,12 +22,13 @@ export default function App() {
   const [addReadingOpen, setAddReadingOpen] = useState(false);
   const [rationaleOpen, setRationaleOpen] = useState(false);
   const [referralOpen, setReferralOpen] = useState(false);
+  const [enrollOpen, setEnrollOpen] = useState(false);
   const [referralParams, setReferralParams] = useState({ weight: 55, deficit: 1028 });
   const [fullCohortOpen, setFullCohortOpen] = useState(false);
   const [programBriefOpen, setProgramBriefOpen] = useState(false);
   const [briefParams, setBriefParams] = useState({ cohortSize: 100000, totalSavingsCr: "19.6", nonResponders: 27200 });
 
-  const currentPatient = PATIENTS.find(p => p.id === selectedPatientId) || PATIENTS[0];
+  const currentPatient = patientList.find(p => p.id === selectedPatientId) || patientList[0];
 
   const handleOpenReferral = (weight, deficit) => {
     setReferralParams({ weight, deficit });
@@ -64,8 +67,10 @@ export default function App() {
         <DoctorWorkspace
           activeTab={doctorTab}
           setActiveTab={setDoctorTab}
+          patients={patientList}
           selectedPatientId={selectedPatientId}
           setSelectedPatientId={setSelectedPatientId}
+          onOpenEnroll={() => setEnrollOpen(true)}
           onExitPortal={() => setView('landing')}
           onOpenNailScan={() => setNailScanOpen(true)}
           onOpenAddReading={() => setAddReadingOpen(true)}
@@ -79,10 +84,21 @@ export default function App() {
       {view === 'patient' && (
         <PatientWorkspace
           onExitPortal={() => setView('landing')}
+          patients={patientList}
+          selectedPatientId={selectedPatientId}
+          onSelectPatientId={(id) => setSelectedPatientId(id)}
         />
       )}
 
       {/* Global Modals */}
+      <EnrollPatientModal
+        isOpen={enrollOpen}
+        onClose={() => setEnrollOpen(false)}
+        onEnrollPatient={(newPatient) => {
+          setPatientList([newPatient, ...patientList]);
+          setSelectedPatientId(newPatient.id);
+        }}
+      />
       <NailScanModal
         isOpen={nailScanOpen}
         onClose={() => setNailScanOpen(false)}

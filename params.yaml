@@ -1,0 +1,206 @@
+response_rule:
+  day14_rise_threshold:
+    value: 1.0
+    unit: g/dL
+    source: Okam, Koch & Tran, Haematologica 2016;101:e6-e7
+    page: p. e6
+    status: sourced
+    note: responder = Hb rise >= 1.0 at day 14; non-responder = rise < 1.0
+  accuracy_of_rule:
+    sensitivity: 0.901
+    specificity: 0.793
+    ppv: 0.929
+    source: Okam 2016
+    page: p. e6
+    status: sourced
+    note: CHECK IN THE PDF which later outcome these refer to; sheet does not say.
+      Write it correctly in README.
+okam_pooled_cohort:
+  n_total: 738
+  n_responders: 537
+  n_non_responders: 201
+  non_responder_fraction_day14:
+    value: 0.272
+    status: derived
+  non_responder_fraction_range_for_scenarios:
+    low: 0.272
+    high: 0.616
+    source: Okam 2016 p. e7 (separate earlier trial, ref 9)
+    status: derived
+  baseline_hb:
+    responders: 9.1
+    non_responders: 9.8
+    page: p. e6
+    status: sourced
+  mean_age_years:
+    responders: 32.9
+    non_responders: 39.7
+    status: sourced
+okam_trajectory_share_reaching_rise:
+  day28:
+    ge_1:
+      responders: 1.0
+      non_responders: 0.468
+    ge_2:
+      responders: 0.849
+      non_responders: 0.134
+    ge_3:
+      responders: 0.488
+      non_responders: 0.025
+  day42:
+    ge_1:
+      responders: 1.0
+      non_responders: 0.632
+    ge_2:
+      responders: 0.929
+      non_responders: 0.274
+    ge_3:
+      responders: 0.607
+      non_responders: 0.055
+  final:
+    ge_1:
+      responders: 0.987
+      non_responders: 0.617
+    ge_2:
+      responders: 0.888
+      non_responders: 0.279
+    ge_3:
+      responders: 0.568
+      non_responders: 0.07
+  status: sourced
+  note: Many day-14 non-responders DO rise later. Product wording must say "slow response",
+    not "will never respond".
+day14_response_by_cause:
+  post_partum: 0.955
+  heavy_uterine_bleeding: 0.563
+  gastrointestinal: 0.535
+  other: 0.429
+  source: Okam 2016 pp. e6-e7
+  status: sourced
+adherence:
+  non_adherence_background:
+    day14: 0.1
+    two_months: 0.32
+    source: Okam 2016 p. e6 (estimate quoted from other work)
+    status: sourced
+  compliance_in_trials:
+    min: 0.839
+    max: 0.985
+    source: Okam 2016 Table 1
+    status: sourced
+  mean_compliance_india:
+    week8:
+      mean: 0.876
+      sd: 0.181
+    week20:
+      mean: 0.891
+      sd: 0.143
+    source: Athiyarath et al., Genes Nutr 2015;10:25, p. 3
+    status: sourced
+  poor_compliance_cutoff: 0.6
+  poor_compliance_cutoff_status: sourced
+india_calibration_athiyarath:
+  n_treated: 181
+  baseline_hb:
+    mean: 9.34
+    sd: 1.19
+  hb_week8:
+    mean: 10.8
+    sd: 1.27
+    n: 161
+  hb_week20:
+    mean: 11.4
+    sd: 1.4
+    n: 139
+  baseline_mcv_fl: 70.7
+  good_response_definition: Hb > 10.5 g/dL with ferritin > 12 ng/mL or transferrin
+    saturation > 16%
+  good_response_fraction:
+    week8: 0.764
+    week20: 0.798
+  poor_response_fraction:
+    week8: 0.205
+    week20: 0.122
+  poor_at_week8_improved_by_week20: 0.485
+  good_response_by_gravida:
+    primigravida:
+      week8: 0.83
+      week20: 0.912
+    second_or_third_gravida_from_counts:
+      week8: 0.607
+      week20: 0.632
+  source: Athiyarath et al. 2015
+  status: sourced
+dryad_oral_arm_validation:
+  screening_hb:
+    mean: 10.215
+    sd: 0.545
+    n: 40
+  hb_week4:
+    mean: 10.629
+    sd: 0.989
+    n: 38
+  hb_week8:
+    mean: 11.176
+    sd: 0.771
+    n: 21
+  rise_screening_to_week4:
+    mean: 0.376
+    sd: 0.691
+    n: 38
+  rise_screening_to_week8:
+    mean: 0.748
+    sd: 0.682
+    n: 21
+  status: derived
+  note: No day-14 Hb in this file, so the day-14 rule cannot be tested on it. Mild
+    anemia, late pregnancy; rises are smaller than the Indian cohort. Use as a second,
+    harder check.
+iv_iron_effect:
+  extra_hb_at_week4:
+    value: 0.84
+    ci95:
+    - 0.59
+    - 1.09
+    unit: g/dL
+    source: IV vs oral meta-analysis abstract (11 RCTs, pregnancy). Team must fill
+      title/authors/journal in the sheet.
+    status: sourced
+  conservative_extra_hb:
+    value: 0.4
+    unit: g/dL
+    source: Qayyum et al., Cureus 2025;17(2):e78326, p. 15 (IV 2.05 vs oral 1.65,
+      baseline to 6 weeks postpartum)
+    status: sourced
+  odds_ratio_reach_target_hb:
+    value: 2.66
+    ci95:
+    - 1.71
+    - 4.15
+  odds_ratio_adverse_reactions:
+    value: 0.35
+    ci95:
+    - 0.18
+    - 0.67
+simulator_assumptions:
+  hb_curve_shape: Hb(t) = Hb0 + gain_max * (1 - exp(-k * t_days))
+  k_per_day:
+    value: 0.04
+    status: assumption
+    note: tune so mean Hb matches Athiyarath week 8 and week 20
+  gain_max_responders:
+    value: 3.5
+    status: assumption
+    note: tune the same way
+  gain_max_non_responders:
+    value: 0.5
+    status: assumption
+    note: tune to match Okam Figure 1 share reaching +1 and +2 g/dL
+  measurement_noise_sd:
+    value: 0.1
+    status: assumption
+    note: pick from Dryad within-patient scatter
+    then say so: null
+  non_responder_fraction_default:
+    value: 0.272
+    status: derived
