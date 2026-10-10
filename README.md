@@ -24,19 +24,15 @@
 
 ## 👥 Team & Project Information
 
-* **Team Name:** [Your Team Name]
-* **Team Members:**
-  * [Member 1 Name] — [Role, e.g., ML Engineering / Backend]
-  * [Member 2 Name] — [Role, e.g., Frontend & UI/UX]
-  * [Member 3 Name] — [Role, e.g., Clinical Data Research]
-* **College / Incubator:** [Your College / Institute / Incubator Name], India
+* **Team Name:** [Oceanseekers]
+* **College / Incubator:** Manipal University Jaipur, India
 * **Track:** Digital Twin Proof-of-Concept — Happiest Health Summit 2026
 
 ---
 
 ## 📌 Project Title & Executive Summary
 
-**Project Title:** **IronTwin: A Multimodal AI Digital Twin Fusing EHR, Wearable IoT Telemetry, and Smartphone Nailbed Vision to Intercept Oral Iron Failure at Day 14**
+**Project Title:** **Hemalyx: A Multimodal AI Digital Twin Fusing EHR, Wearable IoT Telemetry, and Smartphone Nailbed Vision to Intercept Oral Iron Failure at Day 14**
 
 **Summary:**  
 Over 57% of Indian women of reproductive age suffer from iron deficiency anemia (NFHS-5). While standard public health programs (Anemia Mukt Bharat) prescribe oral iron tablets for 8–12 weeks, **~27.2% of patients fail to respond** due to systemic inflammation (hepcidin-mediated enterocyte ferroportin block), poor compliance, or occult blood loss. Under current standards of care, this failure is only discovered at the end of the trimester, causing maternal morbidity, cognitive fatigue, and emergency transfusions.
@@ -260,11 +256,6 @@ python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000
 Open **`http://localhost:8000/`** in your browser to access the complete application.
 
 ---
-
-## 📜 Open-Source License & Citations
-
-### License
-This project is licensed under the **MIT Open Source License**. See the [LICENSE](LICENSE) file for complete terms.
 
 ### Academic References
 1. **Okam MM, Koch TA, Tran MH.** *Virchow's triad and hemoglobin response to oral iron: definition of early non-response.* **Haematologica**, 2016; 101:e6-e7.
