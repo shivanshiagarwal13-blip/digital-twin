@@ -217,10 +217,12 @@ Generates a 1-click clinical escalation note recommending Ferric Carboxymaltose 
 * Python 3.10+ (Tested on Python 3.11 / 3.12 / 3.14)
 * Node.js 18+ and npm
 
-### 1. Clone & Set Up Python Virtual Environment
+### 1. Clone & Install Dependencies
 ```bash
-git clone https://github.com/[your-username]/irontwin.git
-cd irontwin/irontwin
+git clone https://github.com/shivanshiagarwal13-blip/digital-twin.git
+cd digital-twin
+
+# Python dependencies
 python -m venv venv
 # On Windows:
 .\venv\Scripts\activate
@@ -228,32 +230,35 @@ python -m venv venv
 source venv/bin/activate
 
 pip install -r requirements.txt
-```
 
-### 2. Generate Simulated Cohort & Train Models
-```bash
-# Calibrate simulator and generate 2,000 virtual patient records
-python -m model.simulator
-
-# Validate against clinical benchmarks and save plots to docs/
-python -m model.validate
-
-# Train Okam, Logistic Regression, and Gradient Boosting models
-python -m model.train
-```
-
-### 3. Build Frontend & Launch Live Server
-```bash
-# Build the React frontend production bundle
-cd frontend
+# Frontend dependencies
 npm install
-npm run build
-cd ..
+```
 
-# Start the unified FastAPI application
+### 2. Run the Application
+
+You can run the full-stack system in either of two ways:
+
+#### Option A: Unified FastAPI Server (Serves both API & Frontend)
+```bash
+# 1. Build the frontend production bundle
+npm run build
+
+# 2. Start the unified FastAPI server
 python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000
 ```
-Open **`http://localhost:8000/`** in your browser to access the complete application.
+Open **`http://localhost:8000/`** in your browser.
+
+#### Option B: Dual Dev Servers (Vite + FastAPI hot-reloading)
+* Terminal 1 (Backend API):
+  ```bash
+  python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
+  ```
+* Terminal 2 (Frontend Dev):
+  ```bash
+  npm run dev
+  ```
+Open the Vite URL (typically `http://localhost:5173/`).
 
 ---
 

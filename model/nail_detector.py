@@ -18,11 +18,21 @@ from PIL import Image
 from scipy.ndimage import uniform_filter
 from scipy.stats import kurtosis, skew
 
-# Paths to models in health root
-HEALTH_ROOT = Path(__file__).resolve().parents[2]
-MODEL_PATH = HEALTH_ROOT / "mlp_model.joblib"
-SCALER_PATH = HEALTH_ROOT / "feature_scaler.joblib"
-METADATA_PATH = HEALTH_ROOT / "model_metadata.json"
+# Search paths for models (supports model folder, repo root, or parent folders)
+CURRENT_DIR = Path(__file__).resolve().parent
+REPO_ROOT = CURRENT_DIR.parent
+HEALTH_ROOT = REPO_ROOT.parent
+
+def _find_path(filename: str) -> Path:
+    candidates = [
+        CURRENT_DIR / filename,
+        REPO_ROOT / filename,
+        HEALTH_ROOT / filename,
+    ]
+    for p in candidates:
+        if p.exists():
+            return p
+    return CURRENT_DIR / filename
 
 _model = None
 _scaler = None
@@ -32,12 +42,18 @@ _metadata = None
 def load_artifacts():
     global _model, _scaler, _metadata
     if _model is None:
-        if not MODEL_PATH.exists() or not SCALER_PATH.exists():
-            raise FileNotFoundError(f"Model artifacts not found in {HEALTH_ROOT}")
-        _model = joblib.load(MODEL_PATH)
-        _scaler = joblib.load(SCALER_PATH)
-        if METADATA_PATH.exists():
-            with open(METADATA_PATH, "r", encoding="utf-8") as f:
+        model_path = _find_path("mlp_model.joblib")
+        scaler_path = _find_path("feature_scaler.joblib")
+        metadata_path = _find_path("model_metadata.json")
+
+        if not model_path.exists() or not scaler_path.exists():
+            raise FileNotFoundError(
+                f"Model artifacts (mlp_model.joblib, feature_scaler.joblib) not found. Checked: {CURRENT_DIR}, {REPO_ROOT}"
+            )
+        _model = joblib.load(model_path)
+        _scaler = joblib.load(scaler_path)
+        if metadata_path.exists():
+            with open(metadata_path, "r", encoding="utf-8") as f:
                 _metadata = json.load(f)
         else:
             _metadata = {}

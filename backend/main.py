@@ -414,12 +414,17 @@ async def screen_nail(image: UploadFile = File(...)) -> schemas.NailScreeningRes
 
 
 # ── frontend static mount (for instant UI preview at http://localhost:8000/) ──
-DIGITAL_TWIN_DIST = ROOT.parent / "digital-twin-main" / "dist"
-FRONTEND_DIST = ROOT / "frontend" / "dist"
+STATIC_CANDIDATES = [
+    ROOT / "dist",
+    ROOT.parent / "dist",
+    ROOT.parent / "digital-twin-main" / "dist",
+    ROOT / "frontend" / "dist",
+]
 
-if DIGITAL_TWIN_DIST.exists():
-    app.mount("/", StaticFiles(directory=str(DIGITAL_TWIN_DIST), html=True), name="frontend")
-elif FRONTEND_DIST.exists():
-    app.mount("/", StaticFiles(directory=str(FRONTEND_DIST), html=True), name="frontend")
+for static_dir in STATIC_CANDIDATES:
+    if static_dir.exists() and (static_dir / "index.html").exists():
+        app.mount("/", StaticFiles(directory=str(static_dir), html=True), name="frontend")
+        print(f"[main] Serving frontend bundle from {static_dir}")
+        break
 
 
