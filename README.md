@@ -202,16 +202,15 @@ Generates a 1-click clinical escalation note recommending Ferric Carboxymaltose 
 
 ---
 
-## 🎥 Demo Video & Presentation Links
+## Presentation Links
 
-* **15-20 Minute Demo Video (Unlisted YouTube):** `[INSERT YOUR YOUTUBE LINK HERE]`
 * **Project Presentation Slides (PDF / PPT):** `[INSERT YOUR DRIVE / GITHUB LINK TO PPT/PDF HERE]`
 * **Architecture Diagram (PDF / PPT):** `[INSERT LINK TO ARCHITECTURE PPT/PDF HERE]`
 * **Public Access Notice:** All links and resources provided above are set to public view without requiring access permissions.
 
 ---
 
-## 🚀 Quickstart & Reproduction Guide
+##  Quickstart & Reproduction Guide
 
 ### Prerequisites
 * Python 3.10+ (Tested on Python 3.11 / 3.12 / 3.14)
