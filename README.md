@@ -204,8 +204,8 @@ Generates a 1-click clinical escalation note recommending Ferric Carboxymaltose 
 
 ## Presentation Links
 
-* **Project Presentation Slides (PDF / PPT):** `[INSERT YOUR DRIVE / GITHUB LINK TO PPT/PDF HERE]`
-* **Architecture Diagram (PDF / PPT):** `[INSERT LINK TO ARCHITECTURE PPT/PDF HERE]`
+* **Project Presentation Slides (PDF / PPT):** https://drive.google.com/file/d/1uHW-niL_QA4HztVXBldd7lQ-4ItY6E5H/view?usp=sharing
+* **Architecture Diagram (PDF / PPT):** https://drive.google.com/file/d/1yuZ76Q94MgzQKAmq7EfZkUn9TyKNDiYC/view?usp=sharing
 * **Public Access Notice:** All links and resources provided above are set to public view without requiring access permissions.
 
 ---
